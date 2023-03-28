@@ -271,7 +271,7 @@ if button:
                         st.image(pic, use_column_width=True)
                         st.metric(label='',value=(f"{table[city]['temp'][day]} °C"))
                 #после прогноза для города разместим иконку яндекс погоды - по требованию яндекс api
-                st.image("https://drscdn.500px.org/photo/1065499230/q%3D80_h%3D600/v2?sig=2845fd1f255785a5adc87974be09e76efe59e9eba690a187783d633d9f9855f6",width=300)
+                st.image('https://i.ibb.co/ZLZSDKx/image.png',width=250)
         #в конце отметим города, для которых не создался прогноз. это может случиться, если пользователь ввел случайные символы.
         for i in no_weather:
             st.error('Для города '+i+' погода не нашлась',icon="✈️")
