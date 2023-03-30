@@ -78,12 +78,11 @@ def get_weather(city, start_date, end_date):
     forecast = forecast.loc[mask].reset_index()
     final=''
     
-    #в этом блоке прописаны условия, при которых формируем вывод о погоде, 
-    #например если большую часть путешествия будет облачно или пасмурно, то вывод - облачно
-    if ((forecast['condition']=='cloudy').sum()+(forecast['condition']=='overcast').sum())/len(forecast) >= 0.5:
-        final = 'будет облачно...'
-       
-    
+    #в этом блоке прописаны условия, при которых формируем вывод о погоде:
+    #для пасмурной погоды:
+    if (forecast['condition']=='overcast').sum())/len(forecast) > 0.5:
+        final = 'будет пасмурно...'
+    #для дождливой погоды:
     if ((forecast['condition']=='drizzle').sum()+
         (forecast['condition']=='light-rain').sum()+
        (forecast['condition']=='rain').sum()+
@@ -92,10 +91,10 @@ def get_weather(city, start_date, end_date):
         (forecast['condition']=='hail').sum()+
        (forecast['condition']=='thunderstorm').sum()+
        (forecast['condition']=='thunderstorm-with-rain').sum()+
-        (forecast['condition']=='thunderstorm-with-hail').sum())/len(forecast) >= 0.5:
+        (forecast['condition']=='thunderstorm-with-hail').sum())/len(forecast) > 0.5:
         final = 'будет дождливо('
     
-    
+    #если будет дождливая погода и грозы
     if (((forecast['condition']=='drizzle').sum()+
         (forecast['condition']=='light-rain').sum()+
         (forecast['condition']=='rain').sum()+
@@ -104,13 +103,14 @@ def get_weather(city, start_date, end_date):
         (forecast['condition']=='hail').sum()+
         (forecast['condition']=='thunderstorm').sum()+
         (forecast['condition']=='thunderstorm-with-rain').sum()+
-        (forecast['condition']=='thunderstorm-with-hail').sum())/len(forecast) >= 0.5
+        (forecast['condition']=='thunderstorm-with-hail').sum())/len(forecast) > 0.5
     and 
     (((forecast['condition']=='thunderstorm').sum()+
       (forecast['condition']=='thunderstorm-with-rain').sum()+
-      (forecast['condition']=='thunderstorm-with-hail').sum())/len(forecast) >= 0.28)):
+      (forecast['condition']=='thunderstorm-with-hail').sum())/len(forecast) > 0.28)):
         final = 'будут дожди и грозы!'
         
+    #если будет пасмурно и осадки    
     if (((forecast['condition']=='drizzle').sum()+
         (forecast['condition']=='light-rain').sum()+
         (forecast['condition']=='rain').sum()+
@@ -122,19 +122,18 @@ def get_weather(city, start_date, end_date):
         (forecast['condition']=='thunderstorm-with-hail').sum()+
         ((forecast['condition']=='light-snow').sum()+
         (forecast['condition']=='snow').sum()+
-       (forecast['condition']=='snow-showers').sum())/len(forecast) >= 0.28
-    and 
-        (((forecast['condition']=='cloudy').sum()+
-          (forecast['condition']=='overcast').sum())/len(forecast) >= 0.28))):
+       (forecast['condition']=='snow-showers').sum())/len(forecast) > 0.28
+    and
+         (((forecast['condition']=='overcast').sum())/len(forecast) > 0.28))):
         final = 'будет пасмурно и осадки'
 
- 
+    #для снежной погоды
     if ((forecast['condition']=='light-snow').sum()+
         (forecast['condition']=='snow').sum()+
-       (forecast['condition']=='snow-showers').sum())/len(forecast) >= 0.5:
+       (forecast['condition']=='snow-showers').sum())/len(forecast) > 0.5:
         final = 'будет снежно!'
   
-    
+    #для снежной погоды
     if ((forecast['condition']=='wet-snow').sum()/len(forecast) >= 0.114 
     and 
      ((forecast['condition']=='drizzle').sum()+
@@ -147,13 +146,14 @@ def get_weather(city, start_date, end_date):
       (forecast['condition']=='thunderstorm-with-rain').sum()+
       (forecast['condition']=='thunderstorm-with-hail').sum())
         /len(forecast) >= 0.28):
-            final = 'будет слякоть и мокрый снег!'
+            final = 'будут дожди и мокрый снег!'
 
 
-    if (forecast['condition']=='wet-snow').sum()/len(forecast) >= 0.5:
-        final = 'будет снег с дождем...'
-    if ((forecast['condition']=='clear').sum()+(forecast['condition']=='partly-cloudy').sum())/len(forecast) >= 0.5:
+    if (forecast['condition']=='wet-snow').sum()/len(forecast) > 0.5:
+        final = 'будет дождь со снегом...'
+    if ((forecast['condition']=='clear').sum()+(forecast['condition']=='partly-cloudy')+(forecast['condition']=='cloudy').sum())/len(forecast) > 0.5:
         final = 'будет солнечно! Ура!)'
+    #если погода не подошла ни под одно из условий, скажем, что она переменчивая
     if final=='':
         final='будет переменчивая погода'
     return forecast,final
