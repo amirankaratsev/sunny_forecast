@@ -148,10 +148,11 @@ def get_weather(city, start_date, end_date):
         /len(forecast) >= 0.28):
             final = 'будут дожди и мокрый снег!'
 
-
+    #для дождя со снегом
     if (forecast['condition']=='wet-snow').sum()/len(forecast) > 0.5:
         final = 'будет дождь со снегом...'
-    if ((forecast['condition']=='clear').sum()+(forecast['condition']=='partly-cloudy')+(forecast['condition']=='cloudy').sum())/len(forecast) > 0.5:
+    #для солнечной погоды
+    if ((forecast['condition']=='clear').sum()+(forecast['condition']=='partly-cloudy').sum()+(forecast['condition']=='cloudy').sum())/len(forecast) > 0.5:
         final = 'будет солнечно! Ура!)'
     #если погода не подошла ни под одно из условий, скажем, что она переменчивая
     if final=='':
