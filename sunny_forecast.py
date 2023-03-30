@@ -145,7 +145,7 @@ def get_weather(city, start_date, end_date):
       (forecast['condition']=='thunderstorm').sum()+
       (forecast['condition']=='thunderstorm-with-rain').sum()+
       (forecast['condition']=='thunderstorm-with-hail').sum())
-        /len(forecast) > 0.28):
+        /len(forecast) > 0.5):
             final = 'будут дожди и мокрый снег!'
 
     #для дождя со снегом
