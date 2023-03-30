@@ -133,7 +133,7 @@ def get_weather(city, start_date, end_date):
        (forecast['condition']=='snow-showers').sum())/len(forecast) > 0.5:
         final = 'будет снежно!'
   
-    #для снежной погоды
+    #дожди и дождь со снегом
     if ((forecast['condition']=='wet-snow').sum()/len(forecast) >= 0.114 
     and 
      ((forecast['condition']=='drizzle').sum()+
@@ -145,7 +145,7 @@ def get_weather(city, start_date, end_date):
       (forecast['condition']=='thunderstorm').sum()+
       (forecast['condition']=='thunderstorm-with-rain').sum()+
       (forecast['condition']=='thunderstorm-with-hail').sum())
-        /len(forecast) >= 0.28):
+        /len(forecast) > 0.28):
             final = 'будут дожди и мокрый снег!'
 
     #для дождя со снегом
