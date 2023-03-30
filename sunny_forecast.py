@@ -72,17 +72,17 @@ def get_weather(city, start_date, end_date):
         forecast_list.append(new_observation)
     #создадим датасет с прогнозом для каждого города
     forecast=pd.DataFrame(forecast_list)
-    #оставим в датасете только промежуток дат, который ввел пользователь
+    #оставим в датасете только нужный пользователю промежуток дат
     forecast['date'] =pd.to_datetime(forecast['date']).dt.date   
     mask = (forecast['date'] >= start_date) & (forecast['date'] <= end_date)
     forecast = forecast.loc[mask].reset_index()
     final=''
     
-    #в этом блоке прописаны условия, при которых формируем вывод о погоде:
-    #для пасмурной погоды:
+    #в этом блоке прописаны условия, при которых формируем вывод о погоде
+    #например, если большую часть времени пасмурно:
     if (forecast['condition']=='overcast').sum()/len(forecast) > 0.5:
         final = 'будет пасмурно...'
-    #для дождливой погоды:
+    #большую часть времени дождливо:
     if ((forecast['condition']=='drizzle').sum()+
         (forecast['condition']=='light-rain').sum()+
        (forecast['condition']=='rain').sum()+
@@ -133,7 +133,7 @@ def get_weather(city, start_date, end_date):
        (forecast['condition']=='snow-showers').sum())/len(forecast) > 0.5:
         final = 'будет снежно!'
   
-    #дожди и дождь со снегом
+    #если будут идти дождь и дождь со снегом
     if ((forecast['condition']=='wet-snow').sum()/len(forecast) >= 0.114 
     and 
      ((forecast['condition']=='drizzle').sum()+
@@ -182,8 +182,9 @@ week_after = today + datetime.timedelta(days=6)
 start_date = st.date_input('Выберите дату начала поездки:', today,min_value=today,max_value=week_after)
 end_date= st.date_input('Выберите дату возвращения домой:', week_after,min_value=today,max_value=week_after)
 
-
+#period - количество дней путешествия
 period=(end_date-start_date).days+1
+#кнопка "Получить прогноз!" меняет цвет, когда пользователь наводит на нее курсор
 m = st.markdown("""
 <style>
 div.stButton > button:first-child {
@@ -211,14 +212,14 @@ if button:
     with st.spinner('Узнаём погоду'):
         time.sleep(10)
         st.balloons()
-    #если дата начала раньше даты конца, то есть пользователь ввел ее правильно, то начинаем обрабатывать запрос
+    #если дата начала раньше даты конца, значит пользователь ввел ее правильно, начинаем обрабатывать запрос
     if start_date < end_date:
         for i in range(len(input_values)):
             #если поле не пустое:
             if input_values[i]!='':
                 #если геолокатор может закодировать этот город
                 if geolocator.geocode(input_values[i]):
-                    #получаем прогноз - в отдельные списки помещаем таблицу и вывод (forecast в table, final - в append)
+                    #получаем прогноз - в отдельные списки помещаем таблицу и вывод (forecast в table, final - в itog, название города - в names)
                     vse=get_weather(input_values[i],start_date,end_date)
                     table.append(vse[0])
                     itog.append(vse[1])
@@ -252,28 +253,29 @@ if button:
                     itog[i+1]='тоже '+itog[i]
             except IndexError:
                 pass
-        #для каждого города создадим стримлит-контейнер
+        #для вывода погоды по каждому городу создадим стримлит-контейнеры:
         for city in range(len(itog)):
             with st.container():
                 #напишем вывод по погоде в городе на заданный период
+                #название города выведем с заглавной буквы, на случай, если пользователь ввел его с маленькой
                 st.subheader(text[city]+names[city].capitalize()+' '+itog[city])
                 #создадим метку, которая меняется, если встретился солнечный прогноз 
                 if itog[i]=='будет солнечно! Ура!)':
                     sun=1
                 #чтобы отобразить погоду в городе на каждый день, создадим стримлит-колонны
                 weather_for_days=st.columns(period)
-                #для каждого дня разместим иконку - получим ее по методу яндекс api через столбец 'icon' в table
                 images=[]
                 for day in range(len(table[i])):
                     with weather_for_days[day]:
                         #для каждого дня покажем дату, иконку и температуру:
                         st.write(table[city]['date'][day].strftime('%d.%m'))
+                        #иконку сформируем по ссылке, указанной в методе API Яндекс Погоды:
                         pic=(f"{'https://yastatic.net/weather/i/icons/funky/dark/'}{table[city]['icon'][day]}{'.svg'}")
                         st.image(pic, use_column_width=True)
                         st.metric(label='',value=(f"{table[city]['temp'][day]} °C"))
-                #после прогноза для города разместим иконку яндекс погоды - по требованию яндекс api
+                #после прогноза для города разместим иконку яндекс погоды - по требованию яндекса)
                 st.image('https://i.ibb.co/ZLZSDKx/image.png',width=250)
-        #в конце отметим города, для которых не создался прогноз. это может случиться, если пользователь ввел случайные символы.
+        #в конце отметим города, для которых не создался прогноз. это может случиться, если пользователь введет случайные символы
         for i in no_weather:
             st.error('Для города '+i+' погода не нашлась',icon="✈️")
         #если солнечный прогноз не встретился, предложим пользователю посмотреть погоду для других городов:
