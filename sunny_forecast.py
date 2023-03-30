@@ -80,7 +80,7 @@ def get_weather(city, start_date, end_date):
     
     #в этом блоке прописаны условия, при которых формируем вывод о погоде:
     #для пасмурной погоды:
-    if (forecast['condition']=='overcast').sum())/len(forecast) > 0.5:
+    if (forecast['condition']=='overcast').sum()/len(forecast) > 0.5:
         final = 'будет пасмурно...'
     #для дождливой погоды:
     if ((forecast['condition']=='drizzle').sum()+
